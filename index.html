@@ -1,0 +1,416 @@
+:{領導力超能力全解析}:index.html
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>領導力超能力全解析 🚀</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); color: #1e293b; }
+        .vibrant-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 2rem; box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15); }
+        .gradient-text { background: linear-gradient(90deg, #4f46e5, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .progress-bar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .option-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; background: #f8fafc; }
+        .option-btn:hover { background: #ffffff; border-color: #6366f1; transform: scale(1.02); box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2); }
+        .list-item-strength::before { content: "⭐"; margin-right: 8px; }
+        .list-item-warning::before { content: "💡"; margin-right: 8px; }
+    </style>
+</head>
+<body class="min-h-screen py-10 px-4">
+
+    <div id="app" class="max-w-4xl mx-auto vibrant-card p-8 md:p-16">
+        <!-- 開始畫面 -->
+        <div id="intro" class="text-center">
+            <h1 class="text-4xl md:text-5xl font-black mb-6 gradient-text">領導超能力全解析</h1>
+            <p class="text-slate-500 text-lg mb-10 leading-relaxed">在這個快速變動的時代，你的領導底色是什麼？<br>透過 30 個工作情境，我們將解構你的管理工具箱。</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 text-left">
+                <div class="bg-indigo-50 p-6 rounded-2xl">
+                    <h3 class="font-bold text-indigo-800 mb-2">📌 填答提醒</h3>
+                    <p class="text-sm text-indigo-600">請以你目前所在的團隊情境為出發點。即使你同時負責多個細項，也請想像你正在「主導」或「帶領」該項目時的自然反應。</p>
+                </div>
+                <div class="bg-pink-50 p-6 rounded-2xl">
+                    <h3 class="font-bold text-pink-800 mb-2">⚡ 測驗說明</h3>
+                    <p class="text-sm text-pink-600">本測驗共有 30 題，約需 8-10 分鐘。分析結果將結合高曼六風格與三大領導框架，提供深度的職涯建議。</p>
+                </div>
+            </div>
+            
+            <button onclick="startQuiz()" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-black px-12 py-5 rounded-full text-xl shadow-2xl transition-all">
+                展開探索
+            </button>
+        </div>
+
+        <!-- 測驗內容 -->
+        <div id="quiz-container" class="hidden">
+            <div class="mb-10">
+                <div class="flex justify-between items-end mb-3">
+                    <span id="question-count" class="text-2xl font-black text-indigo-600">Q1 <span class="text-slate-300 text-lg">/ 30</span></span>
+                    <span id="percentage" class="text-sm font-bold text-slate-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden">
+                    <div id="progress" class="progress-bar bg-gradient-to-r from-indigo-500 to-pink-500 h-full rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <h2 id="question-text" class="text-2xl font-bold text-slate-800 mb-10 leading-snug">正在準備題目...</h2>
+            
+            <div id="options" class="grid grid-cols-1 gap-4">
+                <!-- 選項 -->
+            </div>
+        </div>
+
+        <!-- 結果畫面 -->
+        <div id="result" class="hidden">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-black text-slate-800 mb-2">你的領導力畫像</h2>
+                <p class="text-slate-500">分析已完成，以下是你的專屬報告</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                <div class="flex justify-center">
+                    <canvas id="radarChart" style="max-width: 400px;"></canvas>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-indigo-600 mb-4">第一階段：高曼六風格分析</h3>
+                    <p id="goleman-description" class="text-slate-600 leading-relaxed mb-6"></p>
+                    <div id="goleman-stats" class="space-y-3">
+                        <!-- 各風格比例 -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-8 md:p-12 rounded-3xl border border-slate-100 mb-12">
+                <h3 class="text-2xl font-black text-slate-800 mb-6 flex items-center">
+                    <span class="bg-indigo-600 text-white w-10 h-10 rounded-lg flex items-center justify-center mr-4 text-sm">核心</span>
+                    三大框架：你屬於 <span id="framework-title" class="ml-2 text-indigo-600"></span>
+                </h3>
+                <p id="framework-description" class="text-slate-600 leading-relaxed mb-10 text-lg"></p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-emerald-50 p-6 rounded-2xl">
+                        <h4 class="font-black text-emerald-800 mb-4 text-xl">🚀 領導優勢</h4>
+                        <ul id="strengths-list" class="space-y-3 text-emerald-700 font-medium"></ul>
+                    </div>
+                    <div class="bg-amber-50 p-6 rounded-2xl">
+                        <h4 class="font-black text-amber-800 mb-4 text-xl">🚧 關鍵提醒</h4>
+                        <ul id="warnings-list" class="space-y-3 text-amber-700 font-medium"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="location.reload()" class="text-indigo-400 hover:text-indigo-600 font-bold transition-colors">
+                    重新測驗
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "專案截止日在即，但一名負責關鍵環節的隊友突然請假，你會？", options: [
+                { t: "直接接手這部分，並用自己的速度讓大家看到什麼是專業。", s: "pacesetting" },
+                { t: "召開 10 分鐘同步會議，詢問大家誰有餘裕分擔部分任務。", s: "democratic" },
+                { t: "重申專案成功的願景，鼓勵大家一起度過難關。", s: "visionary" },
+                { t: "明確指定兩位成員分別處理該項目的前半段與後半段。", s: "commanding" }
+            ]},
+            { q: "團隊對某個設計方向爭執不休，氣氛變得很僵，你會？", options: [
+                { t: "先找情緒波動較大的人聊天，確保大家心情不受損。", s: "affiliative" },
+                { t: "詢問這是否跟這位成員想學習的技術有關，試著引導他思考。", s: "coaching" },
+                { t: "用投票決定，尊重多數人的共識並執行。", s: "democratic" },
+                { t: "拍板決定一個方向，強調現在沒時間糾結，先做再說。", s: "commanding" }
+            ]},
+            { q: "新成員剛入隊，對於重複性高且雜亂的任務感到迷惘，你會？", options: [
+                { t: "跟他聊聊這份工作的長期價值，激發他的熱情。", s: "visionary" },
+                { t: "花時間一對一帶他做一次，幫助他建立個人工作習慣。", s: "coaching" },
+                { t: "給他一份超標準的範本，要求他照著做出一模一樣的產出。", s: "pacesetting" },
+                { t: "直接列出今日待辦清單，要求他每小時回報進度。", s: "commanding" }
+            ]},
+            { q: "引進新的協作工具，但團隊反對聲音很大時，你會？", options: [
+                { t: "描述這套工具將如何解決我們未來半年的協作痛點。", s: "visionary" },
+                { t: "讓大家開會討論，如果大多數人不想換就維持現狀。", s: "democratic" },
+                { t: "舉辦小組關懷日，傾聽大家在轉換工具時的焦慮。", s: "affiliative" },
+                { t: "命令所有人下週一前完成註冊，不准延誤。", s: "commanding" }
+            ]},
+            { q: "面對一個非常緊急且高難度的客戶需求時，你會？", options: [
+                { t: "帶頭衝刺，自己負擔最困難的邏輯部分。", s: "pacesetting" },
+                { t: "告訴大家這是團隊轉型並證明實力的最佳機會。", s: "visionary" },
+                { t: "詢問成員中誰想趁機挑戰新技能，你願意從旁指導。", s: "coaching" },
+                { t: "優先確保成員壓力不會太大，適時安排點心或休息。", s: "affiliative" }
+            ]},
+            { q: "你發現一位老隊員最近產出品質下降，你會？", options: [
+                { t: "找他喝杯咖啡，單純關心他的生活與心情。", s: "affiliative" },
+                { t: "跟他討論他對未來的職涯想像是否有所改變。", s: "coaching" },
+                { t: "在週會上展示高品質的案例，暗示這是應有的標準。", s: "pacesetting" },
+                { t: "要求他提交檢討報告，並設定改善期限。", s: "commanding" }
+            ]},
+            { q: "在預算有限的情況下，需要有人負責冷門的任務時，你會？", options: [
+                { t: "公開所有預算限制，請大家討論如何公平分配。", s: "democratic" },
+                { t: "解釋這個小任務對於整體願景拼圖的關鍵性。", s: "visionary" },
+                { t: "指派給需要練習紀律的成員，並監督他完成。", s: "commanding" },
+                { t: "看誰最近狀態較差，自己先幫忙分擔掉大半。", s: "affiliative" }
+            ]},
+            { q: "當專案大獲成功時，你認為最理想的慶祝方式是？", options: [
+                { t: "一場充滿歡笑且不談公事的團隊聚餐。", s: "affiliative" },
+                { t: "大家坐下來一起回顧這次學到了哪些受用終身的技能。", s: "coaching" },
+                { t: "總結這次的技術突破，並描繪下一個更宏大的目標。", s: "visionary" },
+                { t: "發放獎金，並檢討還有哪些細節可以做得更好。", s: "pacesetting" }
+            ]},
+            { q: "任務分配時，如果有人抱怨工作量不均，你會？", options: [
+                { t: "重新強調公司的產出指標與紀律，不容挑戰。", s: "commanding" },
+                { t: "公開排程表，請抱怨者提出他認為更公平的做法。", s: "democratic" },
+                { t: "解釋這是因為他能力強，能承擔更多重要環節。", s: "visionary" },
+                { t: "自己多領一份工作，以此平息團隊的不滿。", s: "pacesetting" }
+            ]},
+            { q: "當你感覺團隊氛圍因為連續加班而低迷時，你會？", options: [
+                { t: "放大家半天假，或是舉辦輕鬆的分享會。", s: "affiliative" },
+                { t: "站在最前線，展現你依然充滿幹勁的樣子帶動大家。", s: "pacesetting" },
+                { t: "分享專案完成後對社會或公司的價值，重新點燃熱情。", s: "visionary" },
+                { t: "一對一關心成員的體力與壓力負荷。", s: "coaching" }
+            ]},
+            { q: "在規劃年度計劃時，你最看重的是？", options: [
+                { t: "目標是否具備挑戰性與未來的變革性。", s: "visionary" },
+                { t: "團隊成員是否能從中獲得個人能力的增長。", s: "coaching" },
+                { t: "所有的 SOP 與績效指標是否都已明確設定。", s: "commanding" },
+                { t: "這份計劃是否得到了每位成員的真心認同。", s: "democratic" }
+            ]},
+            { q: "當你發現某位細項負責人的進度不如預期，你會？", options: [
+                { t: "直接給出修正清單，要求下班前改好。", s: "commanding" },
+                { t: "跟他一起看，引導他自己找出流程中的瓶頸。", s: "coaching" },
+                { t: "先給予鼓勵，再婉轉提出需要調整的地方。", s: "affiliative" },
+                { t: "示範一次正確的做法，讓他看到什麼是及格線。", s: "pacesetting" }
+            ]},
+            { q: "面對充滿不確定性的新專案，你通常會說？", options: [
+                { t: "「這是我們重新定義市場地位的好機會！」", s: "visionary" },
+                { t: "「這對大家來說都是很好的學習經驗，我們一起摸索。」", s: "coaching" },
+                { t: "「不管多難，我們團隊一定會站在一起解決它。」", s: "affiliative" },
+                { t: "「我已經制定了嚴謹的時程表，大家務必精確執行。」", s: "commanding" }
+            ]},
+            { q: "當團隊內的「意見領袖」與你的看法不一致時，你會？", options: [
+                { t: "尊重他的專業，並請他在會議中完整說明觀點。", s: "democratic" },
+                { t: "請他思考目前的爭論如何幫助團隊達成最終目標。", s: "visionary" },
+                { t: "先安撫氣氛，避免在會議中產生正面衝突。", s: "affiliative" },
+                { t: "要求對方拿出具體數據證明他的方法更有效率。", s: "pacesetting" }
+            ]},
+            { q: "如果你要引進新的工作文化，你的第一步是？", options: [
+                { t: "親自成為這種文化的最強範本，讓大家模仿。", s: "pacesetting" },
+                { t: "描繪這種文化如何帶領團隊走向更高的層次。", s: "visionary" },
+                { t: "找每個人聊聊這種文化對他們個人的意義。", s: "coaching" },
+                { t: "下達行政命令，要求所有工作流程立即更新。", s: "commanding" }
+            ],
+            // 補充剩餘 15 題以達到 30 題 (題目內容因篇幅簡化但邏輯完整)
+            },
+            { q: "當需要向客戶承認團隊犯了小錯誤時，你會？", options: [
+                { t: "先確保犯錯成員的情緒，避免他在壓力下崩潰。", s: "affiliative" },
+                { t: "找出這是一個學習機會，如何避免再犯。", s: "coaching" },
+                { t: "迅速解決問題，要求團隊拿出雙倍效率補回來。", s: "pacesetting" },
+                { t: "對外承擔責任，對內嚴格處分負責該項目的成員。", s: "commanding" }
+            ]},
+            { q: "當任務重疊導致兩個負責人爭執時，你會？", options: [
+                { t: "讓他們兩個人自己協商出一套合作方案。", s: "democratic" },
+                { t: "重新劃分權責藍圖，讓每個人知道自己的位置。", s: "visionary" },
+                { t: "找他們喝茶，化解人際間的疙瘩。", s: "affiliative" },
+                { t: "直接裁決由誰負責，不准再爭執。", s: "commanding" }
+            ]},
+            { q: "在進行績效考核時，你最在意的是？", options: [
+                { t: "是否有達成預設的量化目標。", s: "pacesetting" },
+                { t: "成員是否有實質的技能提升。", s: "coaching" },
+                { t: "成員是否有違反團隊紀律的行為。", s: "commanding" },
+                { t: "成員是否在團隊中感到受尊重且開心。", s: "affiliative" }
+            ]},
+            { q: "面對一個需要長期奮戰的專案，你如何維持動能？", options: [
+                { t: "定期舉行分享會，傾聽大家的心聲。", s: "democratic" },
+                { t: "不斷更新目標願景，維持新鮮感。", s: "visionary" },
+                { t: "建立嚴格的進度檢查點，確保不鬆懈。", s: "commanding" },
+                { t: "獎勵表現卓越的模範生，以此激勵他人。", s: "pacesetting" }
+            ]},
+            { q: "當你發現工作流程有漏洞，你會？", options: [
+                { t: "立即親自修正，並示範正確的做法。", s: "pacesetting" },
+                { t: "請大家開會討論更好的防呆機制。", s: "democratic" },
+                { t: "下令即日起執行新的檢查規則。", s: "commanding" },
+                { t: "告訴大家修正這點後對團隊形象的提升。", s: "visionary" }
+            ]},
+            { q: "當團隊需要接受外界批評時，你會？", options: [
+                { t: "守護成員，先安慰大家的情緒。", s: "affiliative" },
+                { t: "將批評轉化為大家練習解決問題的教材。", s: "coaching" },
+                { t: "帶領大家連夜修改，直到外界閉嘴。", s: "pacesetting" },
+                { t: "要求所有負責人徹底檢討，不准再犯。", s: "commanding" }
+            ]},
+            { q: "在新任務分派時，遇到大家都不想接的雜務？", options: [
+                { t: "解釋這雜務在整體大架構中的地基作用。", s: "visionary" },
+                { t: "詢問誰想趁機多掌握一點雜務背後的系統邏輯。", s: "coaching" },
+                { t: "用輪流制度，確保每個人都要輪到。", s: "democratic" },
+                { t: "指定其中一位成員負責，不准推託。", s: "commanding" }
+            ]},
+            { q: "當團隊達成一個里程碑，但仍有後半段要走？", options: [
+                { t: "提醒大家不要自滿，要求繼續保持高標準。", s: "pacesetting" },
+                { t: "讚賞大家的團結，讓大家休息一下再出發。", s: "affiliative" },
+                { t: "再次確認下一階段的終極理想藍圖。", s: "visionary" },
+                { t: "詢問每位成員在下一階段想負責的部分。", s: "democratic" }
+            ]},
+            { q: "如果你發現成員間有流言蜚語影響工作？", options: [
+                { t: "找當事人單獨聊天，建立信任感。", s: "affiliative" },
+                { t: "提醒大家我們的共同願景是超越這些瑣事。", s: "visionary" },
+                { t: "公開警告這會影響考核，要求立即停止。", s: "commanding" },
+                { t: "引導他們思考這些行為是否符合專業標準。", s: "coaching" }
+            ]},
+            { q: "當你想推動一個實驗性的新專案？", options: [
+                { t: "自己先做出一點小成果，吸引大家跟隨。", s: "pacesetting" },
+                { t: "大談這個實驗如果成功將會帶來的翻轉。", s: "visionary" },
+                { t: "跟每個人確認這是否符合他們個人的興趣。", s: "coaching" },
+                { t: "詢問大家的意見，只有大家都同意才做。", s: "democratic" }
+            ]},
+            { q: "當你覺得會議過於冗長且沒結論？", options: [
+                { t: "直接裁斷，宣布最終決策。", s: "commanding" },
+                { t: "設定一個超高效率的會議流程，要求大家遵守。", s: "pacesetting" },
+                { t: "提醒大家會議的初衷是為了解決大方向問題。", s: "visionary" },
+                { t: "請大家每人說三句話後就散會。", s: "democratic" }
+            ]},
+            { q: "當一個成員因為個人理由想轉崗位？", options: [
+                { t: "花時間分析這對他未來職涯發展的利弊。", s: "coaching" },
+                { t: "先確認目前的團隊和諧是否會因此被破壞。", s: "affiliative" },
+                { t: "如果對整體目標有利就答應，否則直接拒絕。", s: "commanding" },
+                { t: "請大家開會討論這個職位該由誰接替。", s: "democratic" }
+            ]},
+            { q: "當你感到壓力極大時，你通常會？", options: [
+                { t: "埋首工作，用產出來緩解焦慮。", s: "pacesetting" },
+                { t: "找隊友聊聊天，尋求情感支持。", s: "affiliative" },
+                { t: "靜坐思考我們的終極價值，找回動力。", s: "visionary" },
+                { t: "給下屬下達更多詳細指令以維持控制感。", s: "commanding" }
+            ]},
+            { q: "當你需要帶領團隊進入一個完全陌生的市場？", options: [
+                { t: "描繪這個市場的龐大潛力與冒險價值。", s: "visionary" },
+                { t: "尋找具備該市場潛力的成員進行重點培訓。", s: "coaching" },
+                { t: "讓大家一起研究，並整合大家的想法。", s: "democratic" },
+                { t: "制定一份精密的作戰手冊，嚴格要求落地。", s: "commanding" }
+            ]},
+            { q: "最後，你認為領導力最核心的一句話是？", options: [
+                { t: "「跟我來，我帶領大家去更好的未來。」", s: "visionary" },
+                { t: "「讓我們大家聚在一起，互相扶持。」", s: "affiliative" },
+                { t: "「要把事情做到最好，不准妥協。」", s: "pacesetting" },
+                { t: "「每個人都能在工作中發現更好的自己。」", s: "coaching" }
+            ]}
+        ];
+
+        let currentQuestion = 0;
+        let scores = { visionary: 0, coaching: 0, affiliative: 0, democratic: 0, pacesetting: 0, commanding: 0 };
+
+        function startQuiz() {
+            document.getElementById('intro').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('question-count').innerHTML = `Q${currentQuestion + 1} <span class="text-slate-300 text-lg">/ 30</span>`;
+            document.getElementById('question-text').innerText = q.q;
+            const progress = ((currentQuestion + 1) / 30) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+            document.getElementById('percentage').innerText = `${Math.round(progress)}%`;
+            
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-6 rounded-2xl option-btn text-slate-700 font-bold";
+                btn.innerText = opt.t;
+                btn.onclick = () => selectOption(opt.s);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function selectOption(style) {
+            scores[style]++;
+            currentQuestion++;
+            if (currentQuestion < 30) {
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
+
+            // 1. 高曼風格說明
+            const maxStyle = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+            const styleNames = { 
+                visionary: "願景型", coaching: "教練型", affiliative: "親和型", 
+                democratic: "民主型", pacesetting: "標竿型", commanding: "強制型" 
+            };
+            const styleDescs = {
+                visionary: "你擅長描繪充滿感染力的未來，給予團隊明確的價值導向。在需要變革或迷航時，你是最好的引路人。",
+                coaching: "你重視「人」的長遠發展，擅長發掘每個人的潛力。你相信透過個人的成長，最終會帶動組織的卓越。",
+                affiliative: "你以「人和」為優先，擅長修補破碎的關係，建立高度的心理安全感。你是團隊穩定與和諧的基石。",
+                democratic: "你相信群策群力的力量，擅長透過共識決來增加成員的認同感與參與感，讓每個人都覺得被尊重。",
+                pacesetting: "你對效率與品質有極高標準，習慣以身作則，帶領團隊快速衝刺。在追求極致績效時非常強大。",
+                commanding: "你擁有強大的決斷力與主控權，在危機時刻能迅速止損、下達明確指令。你是紀律的保證人。"
+            };
+
+            document.getElementById('goleman-description').innerText = `你的主導高曼風格是「${styleNames[maxStyle]}」。${styleDescs[maxStyle]}`;
+
+            // 2. 三大框架判定
+            const trans = scores.visionary + scores.coaching + scores.pacesetting;
+            const servant = scores.affiliative + scores.democratic + scores.coaching;
+            const transac = scores.commanding + scores.pacesetting + scores.democratic;
+
+            let framework = "";
+            let fDesc = "";
+            let strengths = [];
+            let warnings = [];
+
+            if (trans >= servant && trans >= transac) {
+                framework = "變革型領導 (Transformational)";
+                fDesc = "你不僅是在執行任務，更是在進行一場轉型。你透過強大的願景、個人的成長與對高標準的追求，激發出團隊成員「超乎預期」的潛力。你將高曼的願景與教練風格發揮極致，讓團隊在不斷挑戰中成長。";
+                strengths = ["具備強大的長遠眼光", "能激發團隊的內在動力", "擅長在混沌中找到新路徑", "重視人才的長期培育", "能引領團隊快速成長"];
+                warnings = ["可能過於注重未來而忽略當下細節", "步調過快容易讓成員感到疲倦", "過於理想化可能導致執行落差", "容易忽視規章與現有的制度", "在低壓力的日常任務中會顯得沒耐性"];
+            } else if (servant >= trans && servant >= transac) {
+                framework = "僕人式領導 (Servant)";
+                fDesc = "你以服務團隊為榮。你相信領導者的任務是移除阻礙、提供資源並守護成員的心情。在高曼的架構中，你結合了親和與民主，建立了一個高度信任且低壓力的環境，讓團隊能自發地展現最佳狀態。";
+                strengths = ["擁有極高的團隊凝聚力", "成員擁有極強的歸屬感與忠誠度", "擅長化解衝突並維持心理安全", "決策具備高度的共識基礎", "能留住高品質的核心人才"];
+                warnings = ["決策過程可能過於冗長緩慢", "在危機時刻容易顯得優柔寡斷", "過於保護成員可能導致缺乏競爭力", "容易過度消耗自己的能量來服務他人", "對於表現極差的成員可能太過包容"];
+            } else {
+                framework = "交易型領導 (Transactional)";
+                fDesc = "你是一位精準的執行者。你相信明確的規範、獎懲與標準是達成績效的關鍵。透過高曼的強制與標竿風格，你確保了團隊在重複性任務與高壓環境下依然能精準產出，是組織穩定運作的守護者。";
+                strengths = ["任務執行非常精準且高效", "團隊對績效指標有極清晰的認知", "擅長在危機中迅速穩定局勢", "能建立可量化、可複製的成功流程", "公平的獎懲機制讓目標明確"];
+                warnings = ["長期下來成員可能缺乏自主創新性", "氣氛可能較為嚴肅或低迷", "容易造成優秀成員的心理倦怠", "忽視了隱性的心理與情感需求", "當獎懲失效時，領導力會迅速削弱"];
+            }
+
+            document.getElementById('framework-title').innerText = framework;
+            document.getElementById('framework-description').innerText = fDesc;
+            
+            const sl = document.getElementById('strengths-list');
+            const wl = document.getElementById('warnings-list');
+            sl.innerHTML = ""; wl.innerHTML = "";
+            strengths.forEach(s => sl.innerHTML += `<li class="list-item-strength">${s}</li>`);
+            warnings.forEach(w => wl.innerHTML += `<li class="list-item-warning">${w}</li>`);
+
+            // 3. 圖表渲染
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['願景', '教練', '親和', '民主', '標竿', '強制'],
+                    datasets: [{
+                        label: '風格分佈',
+                        data: [scores.visionary, scores.coaching, scores.affiliative, scores.democratic, scores.pacesetting, scores.commanding],
+                        backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: '#4f46e5',
+                        pointBackgroundColor: '#4f46e5',
+                        borderWidth: 3
+                    }]
+                },
+                options: { 
+                    scales: { r: { beginAtZero: true, max: 10, ticks: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
